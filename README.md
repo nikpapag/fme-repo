@@ -67,6 +67,7 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 | Field | Value |
 |--------|--------|
 | **Name** | `target_country` |
+| **Owners** | `All Project Users` |
 
 4. Select the **staging** environment and click **Initiate Environment**.  
 5. Review changes and click **Save**.
