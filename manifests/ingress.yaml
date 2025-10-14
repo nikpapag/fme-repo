@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: ingress-router-{{ lower .Values.name }}-{{ lower .Values.subdomain }}
+ annotations:
+   kubernetes.io/ingress.class: nginx
+   kubernetes.io/ingress.global-static-ip-name: "payment-service-ip"
+spec:
+  rules:
+  - host: {{lower .Values.subdomain }}.cie-demo.co.uk
+    http:
+     paths:
+     - pathType: ImplementationSpecific
+       backend:
+          service:
+             name: {{lower .Values.name}}-{{lower .Values.subdomain}}-service
+             port:
+               number: 8080
