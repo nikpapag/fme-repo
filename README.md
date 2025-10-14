@@ -225,9 +225,10 @@ This simulates a **progressive rollout** of the feature.
 
 ### Step 1: Create a Chaos Experiment
 1. Duplicate your browser window.  
-2. From the module selection menu, navigate to **Chaos Engineering**.  
-3. Create an **Experiment** targeting your application.  
-4. Configure and start the experiment.
+2. From the module selection menu, navigate to **Chaos Engineering**.
+3. From the left hand side module, select the prebuild chaos experiment **fme-springboot-network-isolation**
+4. Start the experiment
+5. It may take a few seconds before the experiment is in effect
 
 ---
 
@@ -242,9 +243,9 @@ This simulates a **progressive rollout** of the feature.
 
 ## 🧠 8. Review and Wrap-Up
 
-1. Switch to the **Synchronizer Demo**.  
+1. Switch to the **Synchronizer Demo** with the workshop coordinator.  
 2. Review **configuration/code changes**.  
-3. Discuss your results and insights with **Nik**.
+3. Discuss your results and insights.
 
 ---
 
