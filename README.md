@@ -74,11 +74,13 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 ---
 
 ### Step 2: Validate Flag
-Navigate to the application and select/create a user and 
-<img width="500" height="150" alt="image" src="https://github.com/user-attachments/assets/7cfdd129-0d92-4063-97d7-2f64241006c1" />
+1. Navigate to the application and select/create a user 
+   
+<img width="700" height="300" alt="image" src="https://github.com/user-attachments/assets/7cfdd129-0d92-4063-97d7-2f64241006c1" />
 
-confirm that the new feature flag **appears**.
-<img width="550" height="200" alt="image" src="https://github.com/user-attachments/assets/32a7d2db-bbdf-4b1e-a4b7-eca8a19aad5e" />
+3. confirm that the new feature flag **appears**.
+
+<img width="700" height="400" alt="image" src="https://github.com/user-attachments/assets/32a7d2db-bbdf-4b1e-a4b7-eca8a19aad5e" />
 
 
 ---
