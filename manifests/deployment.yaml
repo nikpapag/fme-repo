@@ -1,0 +1,69 @@
+{{- if .Values.env.config}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+data:
+{{.Values.env.config | toYaml | indent 2}}
+---
+{{- end}}
+
+{{- if .Values.env.secrets}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+stringData:
+{{.Values.env.secrets | toYaml | indent 2}}
+---
+{{- end}}
+
+{{- if .Values.dockercfg}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{lower .Values.name}}-{{lower .Values.subdomain}}-dockercfg
+  annotations:
+    harness.io/skip-versioning: "true"
+data:
+  .dockercfg: {{.Values.dockercfg}}
+type: kubernetes.io/dockercfg
+---
+{{- end}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{lower .Values.name}}-{{lower .Values.subdomain}}-deployment
+  labels:
+    owner: {{lower .Values.subdomain}}
+spec:
+  replicas: {{int .Values.replicas}}
+  selector:
+    matchLabels:
+      app: {{lower .Values.name}}-{{lower .Values.subdomain}}
+  template:
+    metadata:
+      labels:
+        app: {{lower .Values.name}}-{{lower .Values.subdomain}}
+        owner: {{lower .Values.subdomain}}
+    spec:
+      {{- if .Values.dockercfg}}
+      imagePullSecrets:
+      - name: {{lower .Values.name}}-{{lower .Values.subdomain}}-dockercfg
+      {{- end}}
+      containers:
+      - name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+        image: {{.Values.image}}
+        imagePullPolicy: Always
+        {{- if or .Values.env.config .Values.env.secrets}}
+        envFrom:
+        {{- if .Values.env.config}}
+        - configMapRef:
+            name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+        {{- end}}
+        {{- if .Values.env.secrets}}
+        - secretRef:
+            name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+        {{- end}}
+        {{- end}}
