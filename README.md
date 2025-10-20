@@ -23,8 +23,7 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 
 ### Step 1: Access Project Settings
 <sub> 1.  From the **left-hand side menu**, navigate to **FME Settings**.</sub>  
-<sub> 2. Among all visible projects, click **View** for the one relevant to your user.</sub>
-
+<sub> 2. Among all visible projects, click **View** for the one relevant to your user.</sub>  
 <sub> 3. You should see two environments — by default, we’ll use the **staging** environment for this lab.</sub>
 
 <img width="783" height="191" alt="image" src="https://github.com/user-attachments/assets/097c1f2b-6815-41e0-ab39-28bc0851057d" />
