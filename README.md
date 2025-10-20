@@ -22,7 +22,7 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 ## ⚙️ 1. Create Workshop Environment
 
 ### Step 1: Access Project Settings
-1. <font size="4"> From the **left-hand side menu**, navigate to **FME Settings**. </font>
+1. <sub> From the **left-hand side menu**, navigate to **FME Settings**. </sub>
 2. Among all visible projects, click **View** for the one relevant to your user.  
 3. You should see two environments — by default, we’ll use the **staging** environment for this lab.
 
