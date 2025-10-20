@@ -66,8 +66,8 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 
 | Field | Value |
 |--------|--------|
-| **Name** | `target_country` |
-| **Owners** | `All Project Users` |
+| **Name** | <pre>`target_country`</pre> |
+| **Owners** | <pre>`All Project Users`</pre> |
 
 4. Select the **staging** environment and click **Initiate Environment**.  
 5. Review changes and click **Save**.
@@ -97,7 +97,7 @@ Let’s target specific user attributes.
 
 | Condition | Action |
 |------------|---------|
-| If `country` is in list `UK` | Serve **On** |
+| If <pre>`country`</pre> is in list <pre>`UK`</pre> | Serve **On** |
 
 4. Review changes and click **Save**.
 
