@@ -31,7 +31,7 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 ---
 
 ### Step 2: Obtain SDK Key
-1. <span style="font-size:12px;">From the **top navigation bar**, select **SDK API Keys**.  </span>
+1. <span style="font-size:4px;">From the **top navigation bar**, select **SDK API Keys**.  </span>
 2. Copy the **server-side key** for the **staging environment**.
 
 ---
