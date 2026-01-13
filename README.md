@@ -242,14 +242,6 @@ This simulates a **progressive rollout** of the feature.
 
 ---
 
-## 🧠 8. Review and Wrap-Up
-
-1. Switch to the **Synchronizer Demo** with the workshop coordinator.  
-2. Review **configuration/code changes**.  
-3. Discuss your results and insights.
-
----
-
 ### ✅ You’ve completed the Feature Management & Experimentation Workshop!
 
 You’ve now explored:
