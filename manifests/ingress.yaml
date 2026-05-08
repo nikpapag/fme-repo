@@ -7,7 +7,7 @@ metadata:
    kubernetes.io/ingress.global-static-ip-name: "payment-service-ip"
 spec:
   rules:
-  - host: {{lower .Values.subdomain }}.cie-demo.co.uk
+  - host: {{lower .Values.subdomain }}.cie-bootcamp.co.uk
     http:
      paths:
      - pathType: ImplementationSpecific
