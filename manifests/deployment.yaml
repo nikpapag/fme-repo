@@ -67,3 +67,5 @@ spec:
             name: {{lower .Values.name}}-{{lower .Values.subdomain}}
         {{- end}}
         {{- end}}
+      nodeSelector:
+        cloud.google.com/gke-nodepool: deploy-pool
