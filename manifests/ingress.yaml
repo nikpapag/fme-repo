@@ -4,7 +4,7 @@ metadata:
  name: ingress-router-{{ lower .Values.name }}-{{ lower .Values.subdomain }}
  annotations:
    kubernetes.io/ingress.class: nginx
-   kubernetes.io/ingress.global-static-ip-name: "payment-service-ip"
+   kubernetes.io/ingress.global-static-ip-name: "bootcamp-static-ip"
 spec:
   rules:
   - host: {{lower .Values.subdomain }}.cie-bootcamp.co.uk
