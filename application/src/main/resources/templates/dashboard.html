@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Feature Flags – Dashboard</title>
+    <link rel="stylesheet" href="/css/harness.css">
+</head>
+<body class="hx-bg">
+<div class="hx-topbar">
+    <div class="hx-brand">Harness</div>
+    <nav class="hx-nav">
+        <a class="is-active" href="/dashboard">Dashboard</a>
+        <a href="/users">Users</a>
+        <a href="/splits">Feature Flags</a>
+        <a href="/evaluate">Evaluate</a>
+        <a href="/simulate">Simulate</a>
+    </nav>
+</div>
+
+<div class="hx-container">
+    <div class="hx-columns">
+        <div class="hx-col">
+
+            <div class="hx-card">
+                <h2 class="hx-h2">Current User</h2>
+                <div class="hx-kv">
+                    <div><span>ID</span><code th:text="${user.id}"></code></div>
+                    <div><span>Name</span><b th:text="${user.name}"></b></div>
+                    <div><span>Email</span><b th:text="${user.email} ?: '-'"></b></div>
+                    <div><span>Plan</span><span class="hx-badge" th:text="${user.plan}"></span></div>
+                    <div><span>Country</span><span class="hx-badge" th:text="${user.country}"></span></div>
+                </div>
+
+                <form action="/impersonate" method="post" class="hx-row mt-2">
+                    <select class="hx-input" name="userId">
+                        <option th:each="e : ${users}"
+                                th:value="${e.key}"
+                                th:text="${e.value.name + ' (' + e.key + ') — ' + e.value.plan + ', ' + e.value.country}">
+                        </option>
+                    </select>
+                    <button class="hx-btn">Switch</button>
+                </form>
+            </div>
+
+            <div class="hx-card">
+                <h2 class="hx-h2">Experiment traffic</h2>
+                <p class="hx-subtle">Generate ≥350 impressions and events per on/off treatment for all metrics.</p>
+                <a class="hx-btn" href="/simulate">Simulate users &amp; generate traffic</a>
+            </div>
+
+            <div class="hx-card">
+                <h2 class="hx-h2">API Quick Links</h2>
+                <ul class="hx-list">
+                    <li><a th:href="@{'/api/users'}">/api/users</a></li>
+                    <li><a th:href="@{'/api/splits'}">/api/splits</a></li>
+                    <li><a th:href="@{'/api/evaluate/' + ${user.id}}">/api/evaluate/{userId}</a></li>
+                </ul>
+                <p class="hx-subtle">Open these to see the raw JSON alongside the pretty pages.</p>
+            </div>
+
+        </div>
+
+        <div class="hx-col">
+            <div class="hx-card">
+                <h2 class="hx-h2">Feature Flags (from Split)</h2>
+
+                <div th:each="splitName : ${splits}" th:with="res=${results[splitName]}" class="hx-flag">
+                    <div class="hx-flag-head">
+                        <div>
+                            <div class="hx-flag-name" th:text="${splitName}"></div>
+                            <div class="hx-subtle">Managed in Split.io</div>
+                        </div>
+                        <div class="hx-badge"
+                             th:classappend="${res != null and res.treatment != null and #strings.equalsIgnoreCase(res.treatment,'on')} ? ' hx-badge-on' : ' hx-badge-off'"
+                             th:text="${res != null and res.treatment != null ? res.treatment : '-'}">
+                        </div>
+                    </div>
+
+                    <div class="hx-meta">
+                        <span>Label: <b th:text="${res != null and res.label != null ? res.label : '-'}"></b></span>
+                        <span>Config: <b th:text="${res != null and res.configJson != null ? res.configJson : '-'}"></b></span>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(splits)}" class="hx-empty">
+                    No splits found for this environment / SDK key.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

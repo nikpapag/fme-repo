@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Feature Flags – Login</title>
+    <link rel="stylesheet" href="/css/harness.css">
+</head>
+<body class="hx-bg">
+<div class="hx-topbar">
+    <div class="hx-brand">Harness</div>
+    <nav class="hx-nav">
+        <a class="is-active" href="/">Login</a>
+    </nav>
+</div>
+
+<div class="hx-container">
+    <div class="hx-card">
+        <h1 class="hx-title">Pick or Create a Demo User</h1>
+        <p class="hx-subtle">No auth—just pick a predefined user or enter traits to simulate targeting.</p>
+
+        <form action="/login" method="post" class="hx-grid">
+            <div>
+                <label class="hx-label">Predefined users</label>
+                <select name="userId" class="hx-input">
+                    <option value="">— Select —</option>
+                    <option th:each="e : ${users}"
+                            th:value="${e.key}"
+                            th:text="${e.value.name + ' (' + e.key + ') — ' + e.value.plan + ', ' + e.value.country}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="hx-sep"><span>or</span></div>
+
+            <div class="hx-grid-2">
+                <div>
+                    <label class="hx-label">Name</label>
+                    <input class="hx-input" name="name" placeholder="Guest">
+                </div>
+                <div>
+                    <label class="hx-label">Email</label>
+                    <input class="hx-input" name="email" placeholder="guest@example.com">
+                </div>
+                <div>
+                    <label class="hx-label">Plan</label>
+                    <select class="hx-input" name="plan">
+                        <option value="free">free</option>
+                        <option value="pro">pro</option>
+                        <option value="enterprise">enterprise</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="hx-label">Country</label>
+                    <input class="hx-input" name="country" placeholder="UK">
+                </div>
+            </div>
+
+            <button class="hx-btn">Continue</button>
+        </form>
+
+        <p class="hx-subtle mt-2" style="margin-top:1.5rem">
+            Or skip login and
+            <a class="hx-btn hx-btn-ghost" href="/simulate" style="display:inline-block;margin-left:8px">Simulate experiment traffic</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Splits</title>
+    <link rel="stylesheet" href="/css/harness.css">
+</head>
+<body class="hx-bg">
+<div class="hx-topbar">
+    <div class="hx-brand">Harness</div>
+    <nav class="hx-nav">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/users">Users</a>
+        <a class="is-active" href="/splits">Feature Flags</a>
+        <a href="/evaluate">Evaluate</a>
+        <a href="/simulate">Simulate</a>
+    </nav>
+</div>
+
+<div class="hx-container">
+    <div class="hx-card">
+        <h1 class="hx-title">Available Splits</h1>
+        <p class="hx-subtle">These names come from Split via the SDK for your environment.</p>
+
+        <ul class="hx-list">
+            <li th:each="name : ${splits}">
+                <div class="hx-row spread">
+                    <div class="hx-flag-name" th:text="${name}"></div>
+                    <div class="hx-row">
+                        <a class="hx-btn hx-btn-ghost hx-btn-small" th:href="@{'/api/evaluate/' + ${currentUser != null ? currentUser.id : 'u001'}}">API Evaluate</a>
+                        <button class="hx-btn hx-btn-small" th:attr="data-n=${name}"
+                                onclick="navigator.clipboard.writeText(this.dataset.n)">Copy name</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <div th:if="${#lists.isEmpty(splits)}" class="hx-empty">No splits found.</div>
+    </div>
+</div>
+</body>
+</html>

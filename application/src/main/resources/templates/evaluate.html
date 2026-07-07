@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Evaluate</title>
+    <link rel="stylesheet" href="/css/harness.css">
+</head>
+<body class="hx-bg">
+<div class="hx-topbar">
+    <div class="hx-brand">Harness</div>
+    <nav class="hx-nav">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/users">Users</a>
+        <a href="/splits">Feature Flags</a>
+        <a class="is-active" href="/evaluate">Evaluate</a>
+        <a href="/simulate">Simulate</a>
+    </nav>
+</div>
+
+<div class="hx-container">
+    <div class="hx-card">
+        <h1 class="hx-title">Evaluate for <span th:text="${user.name}"></span></h1>
+        <p class="hx-subtle">Key: <code th:text="${user.id}"></code> • Plan: <b th:text="${user.plan}"></b> • Country: <b th:text="${user.country}"></b></p>
+        <p><a class="hx-btn hx-btn-ghost" th:href="@{'/api/evaluate/' + ${user.id}}">Open raw JSON</a></p>
+    </div>
+
+    <div class="hx-card">
+        <h2 class="hx-h2">Treatments</h2>
+        <table class="hx-table">
+            <thead><tr><th>Split</th><th>Treatment</th><th>Label</th><th>Config</th></tr></thead>
+            <tbody>
+            <tr th:each="e : ${results}">
+                <td class="mono" th:text="${e.key}"></td>
+                <td>
+              <span class="hx-badge"
+                    th:classappend="${e.value.treatment != null and #strings.equalsIgnoreCase(e.value.treatment,'on')} ? ' hx-badge-on' : ' hx-badge-off'"
+                    th:text="${e.value.treatment ?: '-'}"></span>
+                </td>
+                <td th:text="${e.value.label ?: '-'}"></td>
+                <td class="mono small" th:text="${e.value.configJson ?: '-'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="hx-card">
+        <h2 class="hx-h2">Event tracking</h2>
+        <p class="hx-subtle">Each evaluation sends <code>feature.evaluated</code> to Harness FME. Custom events: <code>POST /api/events/{userId}</code></p>
+    </div>
+
+    <div class="hx-card">
+        <h2 class="hx-h2">Raw JSON (inline)</h2>
+        <pre class="hx-code" id="jsonBox">Loading…</pre>
+    </div>
+</div>
+
+<script>
+    (async () => {
+      try {
+        const res = await fetch('/api/evaluate/' + document.querySelector('code').innerText);
+        const json = await res.json();
+        document.getElementById('jsonBox').textContent = JSON.stringify(json, null, 2);
+      } catch (e) {
+        document.getElementById('jsonBox').textContent = 'Failed to load JSON: ' + e;
+      }
+    })();
+</script>
+</body>
+</html>

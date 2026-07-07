@@ -252,3 +252,143 @@ You’ve now explored:
 - Chaos testing and SDK resilience
 
 🎉 **Great job!**
+
+---
+
+## Repository structure
+
+| Path | Purpose |
+|------|---------|
+| `application/` | Spring Boot workshop app with Harness FME Java SDK |
+| `manifests/` | Kubernetes deployment templates |
+| `values.yaml` | Harness CD service values (SDK key, event tracking env) |
+
+---
+
+## Event tracking and experimentation
+
+This repo sends **Harness FME events** via the Java SDK [`track()`](https://developer.harness.io/docs/feature-management-experimentation/release-monitoring/events/setup) method so you can build **metrics** and measure **experiment impact**.
+
+### Built-in events
+
+| Event type | When fired | Expected Experiment Impact |
+|------------|------------|---------------------------|
+| `feature.evaluated` | Each `getTreatment` evaluation (includes split, treatment, plan, country) | ✅ **POSITIVE** - on=1.0 vs off=0.1 |
+| `user.login` | User signs in | ❌ **NEGATIVE** - on=45.0 vs off=95.0 (regression) |
+| `user.impersonated` | User impersonation | ✅ **POSITIVE** - on=65.0 vs off=15.0 |
+| `feature.dashboard_viewed` | Dashboard load | ⚪ **INCONCLUSIVE** - on=8.2 vs off=8.0 (no sig. diff) |
+
+Events use traffic type **`user`** — the same key as flag evaluations — so metrics attribute correctly to treatments.
+
+**Note**: Event values are calibrated to produce **varied experiment outcomes** (positive, negative, and inconclusive) for workshop demonstration purposes.
+
+### Custom events API
+
+```bash
+curl -X POST "http://localhost:8080/api/events/u001" \
+  -H "Content-Type: application/json" \
+  -d '{"eventType":"checkout.completed","value":99.99,"properties":{"plan":"pro"}}'
+```
+
+### Configure metrics in Harness FME
+
+1. Open **Feature Management & Experimentation** → **Metrics** → **Create metric**.
+2. Choose event type `feature.evaluated` (or a custom type from above).
+3. Attach the metric to a feature flag experiment and review **Metric impact** after events flow (~5 min pipeline delay).
+
+Confirm events in **Admin settings → Event types**.
+
+See **[docs/FME_METRICS.md](docs/FME_METRICS.md)** for which aggregation (Count / Sum / Average) to use per event type.
+
+### Verify impressions (getTreatment)
+
+```bash
+curl "http://localhost:8080/api/diagnostics/impressions?userId=u001"
+```
+
+Each flag should return `on` or `off`, not `control`. Impressions are buffered by the SDK (~5s with `split.impressionsRefreshRate=5`).
+
+### Build and run locally (one command)
+
+```bash
+cp application/.env.example application/.env
+# Edit application/.env — set SPLIT_SDK_KEY to your staging server-side key
+
+./run-local.sh
+```
+
+If it fails, run diagnostics:
+
+```bash
+./run-local.sh doctor
+```
+
+Other modes:
+
+```bash
+./run-local.sh jar       # build JAR, then run it
+./run-local.sh build     # compile only
+./run-local.sh test-api  # API simulation test (needs SPLIT_SDK_KEY)
+./run-local.sh test-ui   # Selenium test (needs Chrome + SPLIT_SDK_KEY)
+```
+
+Manual run:
+
+```bash
+cd application
+export SPLIT_SDK_KEY="your-server-side-sdk-key"
+./mvnw spring-boot:run
+```
+
+### Deploy
+
+Set Harness project variable `sdk_key`, then run the **springboot-deploy** pipeline. Event tracking env vars are injected from `values.yaml`.
+
+---
+
+## Simulate experiment traffic (350+ per treatment)
+
+Use the **Simulate** page (or API) to generate traffic with a strict **impressions → delay → events** sequence per metric:
+
+1. `getTreatment` on all flags (registers impressions)
+2. Wait ~3 seconds (`simulation.eventDelayMs`)
+3. Send that metric’s `track` event — **`on`** uses positive values, **`off`** uses negative/baseline values
+
+Steps repeat for each event type in order: `feature.evaluated`, `user.login`, `feature.dashboard_viewed`, `user.impersonated`.
+
+Continues until **≥350** samples per `on` and `off` per metric per flag.
+
+### UI
+
+1. Log in at `/` (pick any demo user).
+2. Open **Simulate** from the nav or dashboard.
+3. Click **Simulate users & generate traffic**.
+
+### API
+
+```bash
+# Background (poll status)
+curl -X POST "http://localhost:8080/api/simulate?minPerTreatment=350"
+curl "http://localhost:8080/api/simulate/status"
+
+# Blocking (waits until complete)
+curl -X POST "http://localhost:8080/api/simulate?blocking=true&minPerTreatment=350"
+```
+
+### Selenium integration test
+
+Requires `SPLIT_SDK_KEY` and Chrome:
+
+```bash
+cd application
+export SPLIT_SDK_KEY="your-staging-key"
+./mvnw test -Dtest=TrafficSimulationSeleniumIT
+```
+
+Non-UI API test:
+
+```bash
+./mvnw test -Dtest=TrafficSimulationApiIT
+```
+
+> Flags must use **on/off** rollouts (e.g. 50/50). A 100% on rollout cannot reach 350 `off` impressions.
