@@ -358,13 +358,28 @@ Steps repeat for each event type in order: `feature.evaluated`, `user.login`, `f
 
 Continues until **≥350** samples per `on` and `off` per metric per flag.
 
-### UI
+### Scheduled Background Simulation (NEW ✨)
+
+Run simulations automatically as a **background thread** every N seconds without blocking the application:
+
+```properties
+# Enable scheduled background simulation
+simulation.scheduled.enabled=true
+simulation.scheduled.fixedDelayMs=5000
+simulation.scheduled.minPerTreatment=350
+```
+
+The service starts 10 seconds after JVM startup and runs every 5 seconds (configurable). Memory-optimized: only one simulation runs at a time.
+
+📖 **See [docs/SCHEDULED_SIMULATION.md](docs/SCHEDULED_SIMULATION.md)** for full configuration and monitoring guide.
+
+### Manual Simulation (UI)
 
 1. Log in at `/` (pick any demo user).
 2. Open **Simulate** from the nav or dashboard.
 3. Click **Simulate users & generate traffic**.
 
-### API
+### Manual Simulation (API)
 
 ```bash
 # Background (poll status)

@@ -186,6 +186,12 @@ public class TrafficSimulationService {
                         "User %d — %d impressions, %d events (target ≥%d per on/off per metric)",
                         i + 1, totalImpressions.get(), totalEvents.get(), minPerTreatment);
             }
+
+            // Hint to GC: clear user reference after processing to reduce memory pressure
+            // Only keep previousUser for impersonation events
+            if (i % 100 == 0) {
+                System.gc(); // Suggest garbage collection every 100 users to keep memory low
+            }
         }
 
         flushImpressionsAndEvents();
