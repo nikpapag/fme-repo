@@ -14,8 +14,13 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 5. [Segments](#-5-segments)
    - [Test Segment Targeting](#step-2-test-segment-targeting)
 6. [Dynamic Segments](#-6-dynamic-segments)
-7. [Validate Experience During Outage (Advanced)](#-7-validate-experience-during-outage-advanced)
-8. [Review and Wrap-Up](#-8-review-and-wrap-up)
+7. [Experimentation with Metrics and Guardrails](#-7-experimentation-with-metrics-and-guardrails)
+   - [Generate Experiment Traffic](#step-1-generate-experiment-traffic)
+   - [Create Metrics](#step-2-create-metrics)
+   - [Set Up Guardrail Metrics](#step-3-set-up-guardrail-metrics)
+   - [Test Your Experiment](#step-4-test-your-experiment)
+8. [Validate Experience During Outage (Advanced)](#-8-validate-experience-during-outage-advanced)
+9. [Review and Wrap-Up](#-9-review-and-wrap-up)
 
 ---
 
@@ -222,7 +227,231 @@ This simulates a **progressive rollout** of the feature.
 
 ---
 
-## 💥 7. Validate Experience During Outage (Advanced)
+## 🔬 7. Experimentation with Metrics and Guardrails
+
+Now that you've created feature flags and targeting rules, let's set up **experimentation** to measure the impact of your feature on key business metrics.
+
+### Step 1: Generate Experiment Traffic
+
+Before setting up metrics, you need event data. This application includes a **traffic simulation** feature that generates synthetic impressions and events.
+
+#### Option A: Manual Simulation (UI)
+
+1. In the application, navigate to the **Simulate** page from the top navigation.
+2. Click **"Simulate users & generate traffic"** button.
+3. Wait for the simulation to complete (~1-2 minutes depending on flag count).
+4. You should see progress indicators showing:
+   - Users processed
+   - Impressions registered (via `getTreatment`)
+   - Events tracked (via `track()`)
+
+#### Option B: Automatic Background Simulation
+
+For continuous event generation, enable **scheduled background simulation**:
+
+1. Edit your deployment configuration or `values.yaml`:
+   ```yaml
+   env:
+     SIMULATION_SCHEDULED_ENABLED: "true"
+     SIMULATION_SCHEDULED_FIXED_DELAY_MS: "5000"
+     SIMULATION_SCHEDULED_MIN_PER_TREATMENT: "100"
+   ```
+
+2. Redeploy the application - simulation will run automatically every 5 seconds.
+
+3. Monitor via API:
+   ```bash
+   curl "http://<<project_name>>.cie-demo.co.uk/api/simulate/status"
+   ```
+
+📖 **Learn more**: See [docs/SCHEDULED_SIMULATION.md](docs/SCHEDULED_SIMULATION.md) for configuration details.
+
+#### Option C: API-Based Simulation
+
+Trigger simulation via REST API:
+
+```bash
+# Start simulation (non-blocking)
+curl -X POST "http://<<project_name>>.cie-demo.co.uk/api/simulate?minPerTreatment=100"
+
+# Check status
+curl "http://<<project_name>>.cie-demo.co.uk/api/simulate/status"
+```
+
+---
+
+### Step 2: Create Metrics
+
+Metrics let you measure the impact of feature flag treatments on business outcomes.
+
+#### Built-in Event Types
+
+This application tracks these events automatically:
+
+| Event Type | Description | Expected Impact |
+|------------|-------------|-----------------|
+| `feature.evaluated` | Flag evaluation event | ✅ Positive (on > off) |
+| `user.login` | User login event | ❌ Negative (on < off) - demonstrates regression detection |
+| `user.impersonated` | User impersonation action | ✅ Positive (on > off) |
+| `feature.dashboard_viewed` | Dashboard view event | ⚪ Inconclusive (on ≈ off) |
+
+#### Create a Metric
+
+1. From Harness FME, navigate to **Metrics** → **Create Metric**.
+2. Fill in the following:
+
+   | Field | Value |
+   |-------|-------|
+   | **Name** | `Feature Evaluation Success` |
+   | **Event Type** | `feature.evaluated` |
+   | **Aggregation** | **Count** (counts total events) |
+   | **Traffic Type** | `user` |
+
+3. Click **Save**.
+
+4. **Repeat** to create additional metrics:
+   - **Name**: `User Login Rate`  
+     **Event**: `user.login`  
+     **Aggregation**: Count
+   
+   - **Name**: `Dashboard Engagement`  
+     **Event**: `feature.dashboard_viewed`  
+     **Aggregation**: Count
+
+💡 **Tip**: Event values are pre-calibrated in this workshop to produce different experiment outcomes (positive, negative, inconclusive) for learning purposes.
+
+---
+
+### Step 3: Set Up Guardrail Metrics
+
+**Guardrail metrics** protect against regressions by automatically flagging experiments where a key metric deteriorates significantly.
+
+#### What Are Guardrails?
+
+Guardrails ensure that while testing a new feature:
+- **Primary metrics** improve (e.g., feature adoption)
+- **Guardrail metrics** don't regress (e.g., login success rate, error rate)
+
+If a guardrail threshold is breached, you'll be alerted to investigate or halt the rollout.
+
+#### Create a Guardrail Metric
+
+1. Go to **Metrics** → **Create Metric**.
+2. Configure:
+
+   | Field | Value |
+   |-------|-------|
+   | **Name** | `Login Success Guardrail` |
+   | **Event Type** | `user.login` |
+   | **Aggregation** | **Sum** (sum of event values) |
+   | **Traffic Type** | `user` |
+   | **Guardrail** | ✅ **Enable** |
+   | **Threshold** | `-20%` (alert if metric drops more than 20%) |
+
+3. Click **Save**.
+
+💡 **Note**: The `user.login` event is configured to show **negative impact** when the feature is "on" (on=45.0 vs off=95.0) — this demonstrates guardrail detection in action!
+
+#### Best Practices for Guardrails
+
+- **Core Experience Metrics**: Page load time, error rate, crash rate
+- **Engagement Metrics**: Session duration, bounce rate
+- **Business Metrics**: Conversion rate, revenue per user
+- **Set Realistic Thresholds**: -10% to -30% depending on metric criticality
+
+---
+
+### Step 4: Test Your Experiment
+
+Now let's attach metrics to a feature flag and run an experiment!
+
+#### Attach Metrics to a Flag
+
+1. Go to **Feature Flags** → Select `target_country` (or another flag with 50/50 rollout).
+2. Navigate to the **Metrics** tab.
+3. Click **Add Metrics**.
+4. Select:
+   - ✅ `Feature Evaluation Success` (primary metric)
+   - ✅ `Login Success Guardrail` (guardrail)
+   - ✅ `Dashboard Engagement` (secondary metric)
+5. Click **Save**.
+
+#### Run Traffic Simulation
+
+If not already running, trigger simulation:
+
+1. **Via UI**: Navigate to `/simulate` and click "Simulate users & generate traffic"
+2. **Via API**: 
+   ```bash
+   curl -X POST "http://<<project_name>>.cie-demo.co.uk/api/simulate?minPerTreatment=350"
+   ```
+3. Wait for **≥350 samples per treatment** (on and off).
+
+#### View Experiment Results
+
+1. Go to **Feature Flags** → `target_country` → **Metrics** tab.
+2. After **5-10 minutes** (event processing pipeline delay), you'll see:
+
+   **Expected Results:**
+   
+   | Metric | Treatment | Result |
+   |--------|-----------|--------|
+   | `Feature Evaluation Success` | **On** | ✅ **+900% lift** (positive impact) |
+   | `Feature Evaluation Success` | **Off** | Baseline |
+   | `Login Success Guardrail` | **On** | ❌ **-53% drop** 🚨 **GUARDRAIL ALERT** |
+   | `Login Success Guardrail` | **Off** | Baseline |
+   | `Dashboard Engagement` | **On** | ⚪ **+2.5% lift** (inconclusive) |
+   | `Dashboard Engagement` | **Off** | Baseline |
+
+3. **Guardrail Alert**: Notice the login metric triggered a guardrail warning! This indicates the feature may be causing login issues and warrants investigation.
+
+#### Interpret Results
+
+- **Positive Lift**: Feature shows improvement → consider wider rollout
+- **Negative Impact with Guardrail Alert**: Feature is causing regressions → investigate or rollback
+- **Inconclusive**: Not enough data or no significant difference → continue monitoring or increase sample size
+
+#### Verify Events in Harness
+
+1. Navigate to **Admin Settings** → **Event Types**.
+2. Confirm you see:
+   - `feature.evaluated`
+   - `user.login`
+   - `feature.dashboard_viewed`
+   - `user.impersonated`
+3. Click on each event to see recent event data.
+
+---
+
+### 🧠 Discussion Questions
+
+1. **Why did the login metric show negative impact?**  
+   *Hint: Check event value configuration in [FmeEventService.java](application/src/main/java/com/harness/workshop/service/FmeEventService.java) — values are intentionally skewed for training.*
+
+2. **When would you halt a rollout based on guardrail metrics?**  
+   *Consider: severity of impact, affected user percentage, alternative solutions.*
+
+3. **How many samples do you need for statistical significance?**  
+   *Rule of thumb: ≥350 per treatment for most A/B tests; higher for smaller effect sizes.*
+
+4. **What's the difference between primary and guardrail metrics?**  
+   *Primary: what you're trying to improve; Guardrail: what you must not break.*
+
+---
+
+### 📊 Next Steps
+
+- Create custom metrics for your own event types
+- Experiment with different aggregations (Count, Sum, Average)
+- Set up multiple guardrails for comprehensive protection
+- Use segments to analyze metric impact by user cohort
+- Integrate with alerting (Slack, PagerDuty) for guardrail breaches
+
+💡 **Pro Tip**: In production, start with **guardrails on critical flows** (authentication, payment, core features) before experimenting with new features.
+
+---
+
+## 💥 8. Validate Experience During Outage (Advanced)
 
 ### Step 1: Create a Chaos Experiment
 1. Duplicate your browser window.  
@@ -242,13 +471,173 @@ This simulates a **progressive rollout** of the feature.
 
 ---
 
+## 🎓 9. Review and Wrap-Up
+
 ### ✅ You’ve completed the Feature Management & Experimentation Workshop!
 
 You’ve now explored:
 - Environment setup and SDK key configuration  
 - Creating and targeting feature flags  
 - Attribute-based and segment-based targeting  
-- Progressive rollouts  
+- Progressive rollouts and percentage-based rollouts
+- Static and dynamic segments
+- **Experimentation with metrics and guardrails** ✨
+- Automated and scheduled traffic simulation
 - Chaos testing and SDK resilience
 
 🎉 **Great job!**
+
+---
+
+## Repository structure
+
+| Path | Purpose |
+|------|---------|
+| `application/` | Spring Boot workshop app with Harness FME Java SDK |
+| `manifests/` | Kubernetes deployment templates |
+| `values.yaml` | Harness CD service values (SDK key, event tracking env) |
+
+---
+
+## Event tracking and experimentation
+
+This repo sends **Harness FME events** via the Java SDK [`track()`](https://developer.harness.io/docs/feature-management-experimentation/release-monitoring/events/setup) method so you can build **metrics** and measure **experiment impact**.
+
+### Built-in events
+
+| Event type | When fired | Expected Experiment Impact |
+|------------|------------|---------------------------|
+| `feature.evaluated` | Each `getTreatment` evaluation (includes split, treatment, plan, country) | ✅ **POSITIVE** - on=1.0 vs off=0.1 |
+| `user.login` | User signs in | ❌ **NEGATIVE** - on=45.0 vs off=95.0 (regression) |
+| `user.impersonated` | User impersonation | ✅ **POSITIVE** - on=65.0 vs off=15.0 |
+| `feature.dashboard_viewed` | Dashboard load | ⚪ **INCONCLUSIVE** - on=8.2 vs off=8.0 (no sig. diff) |
+
+Events use traffic type **`user`** — the same key as flag evaluations — so metrics attribute correctly to treatments.
+
+**Note**: Event values are calibrated to produce **varied experiment outcomes** (positive, negative, and inconclusive) for workshop demonstration purposes.
+
+### Custom events API
+
+```bash
+curl -X POST "http://localhost:8080/api/events/u001" \
+  -H "Content-Type: application/json" \
+  -d '{"eventType":"checkout.completed","value":99.99,"properties":{"plan":"pro"}}'
+```
+
+### Configure metrics in Harness FME
+
+1. Open **Feature Management & Experimentation** → **Metrics** → **Create metric**.
+2. Choose event type `feature.evaluated` (or a custom type from above).
+3. Attach the metric to a feature flag experiment and review **Metric impact** after events flow (~5 min pipeline delay).
+
+Confirm events in **Admin settings → Event types**.
+
+See **[docs/FME_METRICS.md](docs/FME_METRICS.md)** for which aggregation (Count / Sum / Average) to use per event type.
+
+### Verify impressions (getTreatment)
+
+```bash
+curl "http://localhost:8080/api/diagnostics/impressions?userId=u001"
+```
+
+Each flag should return `on` or `off`, not `control`. Impressions are buffered by the SDK (~5s with `split.impressionsRefreshRate=5`).
+
+### Build and run locally (one command)
+
+```bash
+cp application/.env.example application/.env
+# Edit application/.env — set SPLIT_SDK_KEY to your staging server-side key
+
+./run-local.sh
+```
+
+If it fails, run diagnostics:
+
+```bash
+./run-local.sh doctor
+```
+
+Other modes:
+
+```bash
+./run-local.sh jar       # build JAR, then run it
+./run-local.sh build     # compile only
+./run-local.sh test-api  # API simulation test (needs SPLIT_SDK_KEY)
+./run-local.sh test-ui   # Selenium test (needs Chrome + SPLIT_SDK_KEY)
+```
+
+Manual run:
+
+```bash
+cd application
+export SPLIT_SDK_KEY="your-server-side-sdk-key"
+./mvnw spring-boot:run
+```
+
+### Deploy
+
+Set Harness project variable `sdk_key`, then run the **springboot-deploy** pipeline. Event tracking env vars are injected from `values.yaml`.
+
+---
+
+## Simulate experiment traffic (350+ per treatment)
+
+Use the **Simulate** page (or API) to generate traffic with a strict **impressions → delay → events** sequence per metric:
+
+1. `getTreatment` on all flags (registers impressions)
+2. Wait ~3 seconds (`simulation.eventDelayMs`)
+3. Send that metric’s `track` event — **`on`** uses positive values, **`off`** uses negative/baseline values
+
+Steps repeat for each event type in order: `feature.evaluated`, `user.login`, `feature.dashboard_viewed`, `user.impersonated`.
+
+Continues until **≥350** samples per `on` and `off` per metric per flag.
+
+### Scheduled Background Simulation (NEW ✨)
+
+Run simulations automatically as a **background thread** every N seconds without blocking the application:
+
+```properties
+# Enable scheduled background simulation
+simulation.scheduled.enabled=true
+simulation.scheduled.fixedDelayMs=5000
+simulation.scheduled.minPerTreatment=350
+```
+
+The service starts 10 seconds after JVM startup and runs every 5 seconds (configurable). Memory-optimized: only one simulation runs at a time.
+
+📖 **See [docs/SCHEDULED_SIMULATION.md](docs/SCHEDULED_SIMULATION.md)** for full configuration and monitoring guide.
+
+### Manual Simulation (UI)
+
+1. Log in at `/` (pick any demo user).
+2. Open **Simulate** from the nav or dashboard.
+3. Click **Simulate users & generate traffic**.
+
+### Manual Simulation (API)
+
+```bash
+# Background (poll status)
+curl -X POST "http://localhost:8080/api/simulate?minPerTreatment=350"
+curl "http://localhost:8080/api/simulate/status"
+
+# Blocking (waits until complete)
+curl -X POST "http://localhost:8080/api/simulate?blocking=true&minPerTreatment=350"
+```
+
+### Selenium integration test
+
+Requires `SPLIT_SDK_KEY` and Chrome:
+
+```bash
+cd application
+export SPLIT_SDK_KEY="your-staging-key"
+./mvnw test -Dtest=TrafficSimulationSeleniumIT
+```
+
+Non-UI API test:
+
+```bash
+./mvnw test -Dtest=TrafficSimulationApiIT
+```
+
+> Flags must use **on/off** rollouts (e.g. 50/50). A 100% on rollout cannot reach 350 `off` impressions.

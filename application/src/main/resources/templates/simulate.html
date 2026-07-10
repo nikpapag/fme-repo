@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Simulate Experiment Traffic</title>
+    <link rel="stylesheet" href="/css/harness.css">
+</head>
+<body class="hx-bg">
+<div class="hx-topbar">
+    <div class="hx-brand">Harness</div>
+    <nav class="hx-nav">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/users">Users</a>
+        <a href="/splits">Feature Flags</a>
+        <a href="/evaluate">Evaluate</a>
+        <a class="is-active" href="/simulate">Simulate</a>
+    </nav>
+</div>
+
+<div class="hx-container">
+    <div class="hx-card">
+        <h1 class="hx-title">Simulate users &amp; experiment traffic</h1>
+        <p class="hx-subtle" th:if="${user != null}">
+            Logged in as <b th:text="${user.name}"></b> (<code th:text="${user.id}"></code>) — simulation uses synthetic users; login is optional.
+        </p>
+        <p class="hx-subtle" th:if="${user == null}">
+            No login required. <a href="/">Log in</a> if you also want to test the dashboard.
+        </p>
+        <p class="hx-subtle">
+            For <strong>each metric</strong>, in order: (1) <code>getTreatment</code> on all flags to register
+            <strong>impressions</strong>, (2) wait a few seconds, (3) send that metric’s <code>track</code> event.
+            <code>on</code> treatments get <strong>positive</strong> values; <code>off</code> get
+            <strong>negative/baseline</strong> values — so experimentation shows lift vs baseline.
+            Repeats until ≥<span th:text="${minPerTreatment}">350</span> per on/off per metric.
+        </p>
+
+        <div class="hx-row mt-2">
+            <label class="hx-label" for="minPerTreatment">Minimum per treatment</label>
+            <input class="hx-input" type="number" id="minPerTreatment" min="50" max="5000"
+                   th:value="${minPerTreatment}" style="width:120px">
+            <button type="button" class="hx-btn" id="btnSimulate">Simulate users &amp; generate traffic</button>
+        </div>
+
+        <p class="hx-subtle mt-2" id="statusText">Ready.</p>
+        <div class="hx-progress mt-2" aria-hidden="true">
+            <div class="hx-progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
+    </div>
+
+    <div class="hx-card">
+        <h2 class="hx-h2">Metrics generated</h2>
+        <ul class="hx-list">
+            <li><code>feature.evaluated</code> — per flag evaluation</li>
+            <li><code>user.login</code> — synthetic sign-in</li>
+            <li><code>feature.dashboard_viewed</code> — dashboard view</li>
+            <li><code>user.impersonated</code> — periodic impersonation</li>
+        </ul>
+    </div>
+
+    <div class="hx-card">
+        <h2 class="hx-h2">Results</h2>
+        <pre class="hx-code" id="resultBox">Click the button to start.</pre>
+    </div>
+</div>
+
+<script>
+(function () {
+  const btn = document.getElementById('btnSimulate');
+  const statusText = document.getElementById('statusText');
+  const progressBar = document.getElementById('progressBar');
+  const resultBox = document.getElementById('resultBox');
+  const minInput = document.getElementById('minPerTreatment');
+  let pollTimer = null;
+
+  function setProgress(pct, msg) {
+    progressBar.style.width = Math.min(100, pct) + '%';
+    statusText.textContent = msg;
+  }
+
+  async function pollStatus() {
+    const res = await fetch('/api/simulate/status');
+    const data = await res.json();
+    const min = data.minPerTreatment || 350;
+    const users = data.syntheticUsers || 0;
+    const estNeeded = min * 2 * 2;
+    const pct = data.running ? Math.min(95, (users / estNeeded) * 100) : (data.targetsMet ? 100 : 90);
+    setProgress(pct, data.message || (data.running ? 'Running… ' + users + ' users' : 'Done'));
+    if (data.running) {
+      pollTimer = setTimeout(pollStatus, 1500);
+      return;
+    }
+    btn.disabled = false;
+    if (data.lastResult) {
+      resultBox.textContent = JSON.stringify(data.lastResult, null, 2);
+    }
+    clearTimeout(pollTimer);
+  }
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    setProgress(2, 'Starting simulation…');
+    resultBox.textContent = 'Running…';
+    const min = minInput.value || 350;
+    try {
+      const res = await fetch('/api/simulate?minPerTreatment=' + encodeURIComponent(min), { method: 'POST' });
+      const body = await res.json();
+      if (body.status === 'RUNNING' || res.status === 409) {
+        statusText.textContent = 'Already running — polling status…';
+      }
+      pollStatus();
+    } catch (e) {
+      btn.disabled = false;
+      statusText.textContent = 'Error: ' + e;
+    }
+  });
+})();
+</script>
+</body>
+</html>

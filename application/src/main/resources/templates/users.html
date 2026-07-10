@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Users</title>
+    <link rel="stylesheet" href="/css/harness.css">
+</head>
+<body class="hx-bg">
+<div class="hx-topbar">
+    <div class="hx-brand">Harness</div>
+    <nav class="hx-nav">
+        <a href="/dashboard">Dashboard</a>
+        <a class="is-active" href="/users">Users</a>
+        <a href="/splits">Feature Flags</a>
+        <a href="/evaluate">Evaluate</a>
+        <a href="/simulate">Simulate</a>
+    </nav>
+</div>
+
+<div class="hx-container">
+    <div class="hx-card">
+        <h1 class="hx-title">Users</h1>
+        <table class="hx-table">
+            <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Plan</th><th>Country</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${users}">
+                <td><code th:text="${e.key}"></code></td>
+                <td th:text="${e.value.name}"></td>
+                <td th:text="${e.value.email}"></td>
+                <td><span class="hx-badge" th:text="${e.value.plan}"></span></td>
+                <td><span class="hx-badge" th:text="${e.value.country}"></span></td>
+                <td class="hx-actions">
+                    <form action="/impersonate" method="post">
+                        <input type="hidden" name="userId" th:value="${e.key}">
+                        <button class="hx-btn hx-btn-small">Impersonate</button>
+                    </form>
+                    <button class="hx-btn hx-btn-ghost hx-btn-small"
+                            th:attr="data-id=${e.key}"
+                            onclick="navigator.clipboard.writeText(this.dataset.id)">Copy ID</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
