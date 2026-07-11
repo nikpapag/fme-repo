@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+  name: {{lower .Values.name}}-{{lower .Values.project_domain}}
 data:
 {{.Values.env.config | toYaml | indent 2}}
 ---
@@ -12,7 +12,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+  name: {{lower .Values.name}}-{{lower .Values.project_domain}}
 stringData:
 {{.Values.env.secrets | toYaml | indent 2}}
 ---
@@ -22,7 +22,7 @@ stringData:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{lower .Values.name}}-{{lower .Values.subdomain}}-dockercfg
+  name: {{lower .Values.name}}-{{lower .Values.project_domain}}-dockercfg
   annotations:
     harness.io/skip-versioning: "true"
 data:
@@ -34,38 +34,36 @@ type: kubernetes.io/dockercfg
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{lower .Values.name}}-{{lower .Values.subdomain}}-deployment
+  name: {{lower .Values.name}}-{{lower .Values.project_domain}}-deployment
   labels:
-    owner: {{lower .Values.subdomain}}
+    owner: {{lower .Values.project_domain}}
 spec:
   replicas: {{int .Values.replicas}}
   selector:
     matchLabels:
-      app: {{lower .Values.name}}-{{lower .Values.subdomain}}
+      app: {{lower .Values.name}}-{{lower .Values.project_domain}}
   template:
     metadata:
       labels:
-        app: {{lower .Values.name}}-{{lower .Values.subdomain}}
-        owner: {{lower .Values.subdomain}}
+        app: {{lower .Values.name}}-{{lower .Values.project_domain}}
+        owner: {{lower .Values.project_domain}}
     spec:
       {{- if .Values.dockercfg}}
       imagePullSecrets:
-      - name: {{lower .Values.name}}-{{lower .Values.subdomain}}-dockercfg
+      - name: {{lower .Values.name}}-{{lower .Values.project_domain}}-dockercfg
       {{- end}}
       containers:
-      - name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+      - name: {{lower .Values.name}}-{{lower .Values.project_domain}}
         image: {{.Values.image}}
         imagePullPolicy: Always
         {{- if or .Values.env.config .Values.env.secrets}}
         envFrom:
         {{- if .Values.env.config}}
         - configMapRef:
-            name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+            name: {{lower .Values.name}}-{{lower .Values.project_domain}}
         {{- end}}
         {{- if .Values.env.secrets}}
         - secretRef:
-            name: {{lower .Values.name}}-{{lower .Values.subdomain}}
+            name: {{lower .Values.name}}-{{lower .Values.project_domain}}
         {{- end}}
         {{- end}}
-      nodeSelector:
-        cloud.google.com/gke-nodepool: deploy-pool
