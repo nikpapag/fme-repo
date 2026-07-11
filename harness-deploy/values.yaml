@@ -4,8 +4,6 @@ replicas: 1
 image: <+artifact.image>
 dockercfg: <+artifact.imagePullSecret>
 
-sename: <+variable.subdomain>
-
 createNamespace: true
 namespace: <+infra.namespace>
 
@@ -19,7 +17,8 @@ serviceType: LoadBalancer
 servicePort: 8080
 serviceTargetPort: 8080
 
-subdomain: <+variable.subdomain>
+project_domain: <+variable.fmesubdomain>
+lab_subdomain: <+variable.lab_subdomain>
 
 env:
   config:
