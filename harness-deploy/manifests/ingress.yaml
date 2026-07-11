@@ -1,18 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
- name: ingress-router-{{ lower .Values.name }}-{{ lower .Values.subdomain }}
+ name: ingress-router-{{ lower .Values.name }}-{{ lower .Values.project_domain }}
  annotations:
    kubernetes.io/ingress.class: nginx
-   kubernetes.io/ingress.global-static-ip-name: "bootcamp-static-ip"
 spec:
   rules:
-  - host: {{lower .Values.subdomain }}.cie-bootcamp.co.uk
+  - host: {{lower .Values.project_domain }}.{{lower .Values.lab_subdomain }}.harnessevents.com
     http:
      paths:
      - pathType: ImplementationSpecific
        backend:
           service:
-             name: {{lower .Values.name}}-{{lower .Values.subdomain}}-service
+             name: {{lower .Values.name}}-{{lower .Values.project_domain}}-service
              port:
                number: 8080
