@@ -452,15 +452,17 @@ If not already running, trigger simulation:
 - **Negative Impact with Guardrail Alert**: Feature is causing regressions → investigate or rollback
 - **Inconclusive**: Not enough data or no significant difference → continue monitoring or increase sample size
 
-#### Verify Events in Harness
+#### Audit events
 
-1. Navigate to **Admin Settings** → **Event Types**.
-2. Confirm you see:
+1. From the left hand side menu navigate to **Data Hub**
+2. Select the stg environment
+3. From the nav bar switch to **Live tail**
+4. Change data type to **Events**
+5. Start the audit by clicking **Query**
+6. Confirm you see:
    - `feature.evaluated`
    - `user.login`
    - `feature.dashboard_viewed`
-   - `user.impersonated`
-3. Click on each event to see recent event data.
 
 ---
 
@@ -480,38 +482,6 @@ If not already running, trigger simulation:
 
 ---
 
-### 📊 Next Steps
-
-- Create custom metrics for your own event types
-- Experiment with different aggregations (Count, Sum, Average)
-- Set up multiple guardrails for comprehensive protection
-- Use segments to analyze metric impact by user cohort
-- Integrate with alerting (Slack, PagerDuty) for guardrail breaches
-
-💡 **Pro Tip**: In production, start with **guardrails on critical flows** (authentication, payment, core features) before experimenting with new features.
-
----
-
-## 💥 8. Validate Experience During Outage (Advanced)
-
-### Step 1: Create a Chaos Experiment
-1. Duplicate your browser window.  
-2. From the module selection menu, navigate to **Chaos Engineering**.
-3. From the left hand side module, select the prebuild chaos experiment **fme-springboot-network-isolation**
-4. Start the experiment
-5. It may take a few seconds before the experiment is in effect
-
----
-
-### Step 2: Observe SDK Behavior
-1. While the experiment runs, in the second tab open `target_beta_users` feature flag.  
-2. Toggle between **On** and **Off**.  
-3. When the chaos experiment fully targets the pod, notice:  
-   - The SDK **maintains the same flag treatment** (expected behavior).  
-   - This demonstrates resilience — continued experience even when the Split.io platform is unreachable.
-
----
-
 ## 🎓 9. Review and Wrap-Up
 
 ### ✅ You’ve completed the Feature Management & Experimentation Workshop!
@@ -524,9 +494,9 @@ You’ve now explored:
 - Static and dynamic segments
 - **Experimentation with metrics and guardrails** ✨
 - Automated and scheduled traffic simulation
-- Chaos testing and SDK resilience
 
 🎉 **Great job!**
+
 
 ---
 
@@ -557,128 +527,7 @@ Events use traffic type **`user`** — the same key as flag evaluations — so m
 
 **Note**: Event values are calibrated to produce **varied experiment outcomes** (positive, negative, and inconclusive) for workshop demonstration purposes.
 
-### Custom events API
 
-```bash
-curl -X POST "http://localhost:8080/api/events/u001" \
-  -H "Content-Type: application/json" \
-  -d '{"eventType":"checkout.completed","value":99.99,"properties":{"plan":"pro"}}'
-```
 
-### Configure metrics in Harness FME
 
-1. Open **Feature Management & Experimentation** → **Metrics** → **Create metric**.
-2. Choose event type `feature.evaluated` (or a custom type from above).
-3. Attach the metric to a feature flag experiment and review **Metric impact** after events flow (~5 min pipeline delay).
 
-Confirm events in **Admin settings → Event types**.
-
-See **[docs/FME_METRICS.md](docs/FME_METRICS.md)** for which aggregation (Count / Sum / Average) to use per event type.
-
-### Verify impressions (getTreatment)
-
-```bash
-curl "http://localhost:8080/api/diagnostics/impressions?userId=u001"
-```
-
-Each flag should return `on` or `off`, not `control`. Impressions are buffered by the SDK (~5s with `split.impressionsRefreshRate=5`).
-
-### Build and run locally (one command)
-
-```bash
-cp application/.env.example application/.env
-# Edit application/.env — set SPLIT_SDK_KEY to your staging server-side key
-
-./run-local.sh
-```
-
-If it fails, run diagnostics:
-
-```bash
-./run-local.sh doctor
-```
-
-Other modes:
-
-```bash
-./run-local.sh jar       # build JAR, then run it
-./run-local.sh build     # compile only
-./run-local.sh test-api  # API simulation test (needs SPLIT_SDK_KEY)
-./run-local.sh test-ui   # Selenium test (needs Chrome + SPLIT_SDK_KEY)
-```
-
-Manual run:
-
-```bash
-cd application
-export SPLIT_SDK_KEY="your-server-side-sdk-key"
-./mvnw spring-boot:run
-```
-
-### Deploy
-
-Set Harness project variable `sdk_key`, then run the **springboot-deploy** pipeline. Event tracking env vars are injected from `values.yaml`.
-
----
-
-## Simulate experiment traffic (350+ per treatment)
-
-Use the **Simulate** page (or API) to generate traffic with a strict **impressions → delay → events** sequence per metric:
-
-1. `getTreatment` on all flags (registers impressions)
-2. Wait ~3 seconds (`simulation.eventDelayMs`)
-3. Send that metric’s `track` event — **`on`** uses positive values, **`off`** uses negative/baseline values
-
-Steps repeat for each event type in order: `feature.evaluated`, `user.login`, `feature.dashboard_viewed`, `user.impersonated`.
-
-Continues until **≥350** samples per `on` and `off` per metric per flag.
-
-### Scheduled Background Simulation (NEW ✨)
-
-Run simulations automatically as a **background thread** every N seconds without blocking the application:
-
-```properties
-# Enable scheduled background simulation
-simulation.scheduled.enabled=true
-simulation.scheduled.fixedDelayMs=5000
-simulation.scheduled.minPerTreatment=350
-```
-
-The service starts 10 seconds after JVM startup and runs every 5 seconds (configurable). Memory-optimized: only one simulation runs at a time.
-
-📖 **See [docs/SCHEDULED_SIMULATION.md](docs/SCHEDULED_SIMULATION.md)** for full configuration and monitoring guide.
-
-### Manual Simulation (UI)
-
-1. Log in at `/` (pick any demo user).
-2. Open **Simulate** from the nav or dashboard.
-3. Click **Simulate users & generate traffic**.
-
-### Manual Simulation (API)
-
-```bash
-# Background (poll status)
-curl -X POST "http://localhost:8080/api/simulate?minPerTreatment=350"
-curl "http://localhost:8080/api/simulate/status"
-
-# Blocking (waits until complete)
-curl -X POST "http://localhost:8080/api/simulate?blocking=true&minPerTreatment=350"
-```
-
-### Selenium integration test
-
-Requires `SPLIT_SDK_KEY` and Chrome:
-
-```bash
-cd application
-export SPLIT_SDK_KEY="your-staging-key"
-./mvnw test -Dtest=TrafficSimulationSeleniumIT
-```
-
-Non-UI API test:
-
-```bash
-./mvnw test -Dtest=TrafficSimulationApiIT
-```
-
-> Flags must use **on/off** rollouts (e.g. 50/50). A 100% on rollout cannot reach 350 `off` impressions.
