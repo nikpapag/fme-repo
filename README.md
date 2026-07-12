@@ -220,6 +220,10 @@ This simulates a **progressive rollout** of the feature.
 
 6. In the app, select user **Alice**, click **Impersonate**, and navigate to **Evaluate**.  
    - Confirm that Alice (a beta user) receives the **On** treatment.
+  
+> [!WARNING]
+> For the lab the SDK polls for flag changes every 30 seconds, the interval can be reduced from the SDK settings or even be switched to a push model
+
 
 ---
 
