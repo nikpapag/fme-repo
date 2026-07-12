@@ -205,7 +205,7 @@ This simulates a **progressive rollout** of the feature.
 
 | Field | Value |
 |--------|--------|
-| **Name** | `target_beta_users` |
+| **Name** | <pre>`target_beta_users`</pre> |
 
 
 3. Initiate the flag for the **staging** environment.  
