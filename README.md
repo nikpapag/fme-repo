@@ -117,8 +117,7 @@ As part of this lab, we will switch between modules several times.
 
 3. confirm that the new feature flag **appears**.
 
-<img width="700" height="400" alt="image" src="https://github.com/user-attachments/assets/32a7d2db-bbdf-4b1e-a4b7-eca8a19aad5e" />
-
+<img width="1204" height="723" alt="image" src="https://github.com/user-attachments/assets/1154f743-eb75-41a2-84e4-52426d042027" />
 
 ---
 
@@ -128,16 +127,19 @@ Let’s target specific user attributes.
 
 ### Step 1: Add Targeting Rules
 1. Go back to your feature flag `target_country`.  
-2. Click **Add Attribute-Based Targeting Rules**.  
+2. Click **Add Attribute based targeting rules**.  
 3. Configure the rule as follows:
 
 | Condition | Action |
 |------------|---------|
 | If <pre>`country`</pre> is in list <pre>`UK`</pre> | Serve **On** |
 
-4. Review changes and click **Save**.
+<img width="1249" height="263" alt="image" src="https://github.com/user-attachments/assets/d0eb73f2-3edf-4e7f-8ab4-1a769125c953" />
 
-<img width="650" height="370" alt="image" src="https://github.com/user-attachments/assets/731f41d3-69c9-42cb-b96b-0d3dd7e97362" />
+
+4. Click **Review changes**
+5. Validate the audit of the change (change diff)
+6. Click **Save**.
 
 ---
 
@@ -145,7 +147,9 @@ Let’s target specific user attributes.
 1. In the browser app, navigate to the users tab and select user **Alice**.  
 2. Navigate to **Evaluate Flag** → confirm the flag is **On** for Alice.  
 
-💡 **Bonus:** Experiment with other attribute combinations!
+> [!TIP]
+> **Bonus:** Experiment with other attribute combinations!
+
 
 ---
 
