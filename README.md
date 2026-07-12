@@ -23,22 +23,38 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 9. [Review and Wrap-Up](#-9-review-and-wrap-up)
 
 ---
+## Lab Pre-Read
+
+### Changing Harness Modules
+As part of this lab, we will switch between modules several times.
+
+**To switch modules:**
+1. Click on the **nine dot** menu icon
+2. Select the module relevant to the step
+3. The lab begins in the code repository
+
+<img width="362" height="193" alt="image" src="https://github.com/user-attachments/assets/2d953dd9-b370-4308-9504-a9bf13f7fb9a" />
+
 
 ## ⚙️ 1. Create Workshop Environment
 
 ### Step 1: Access Project Settings
-1.  From the **left-hand side menu**, navigate to **FME Settings**.
-2.  Among all visible projects, click **View** for the one relevant to your user.
-3. You should see two environments — by default, we’ll use the **staging** environment for this lab.
+1.  In the Harness UI, navigate to the **Feature Management & Experimentation** module
+2.  From the **left-hand side menu**, navigate to **FME Settings**.
+3.  From the new navigation bar select Projects
+4.  Among all visible projects, click **View** (under Actions) for the one relevant to your user.
+5.  You should see two environments we’ll use the **staging** environment for this lab
 
-<img width="783" height="191" alt="image" src="https://github.com/user-attachments/assets/097c1f2b-6815-41e0-ab39-28bc0851057d" />
+
+
 
 ---
 
-### Step 2: Obtain SDK Key
-1. From the **top navigation bar**, select **SDK API Keys**.
-2. Copy the **server-side key** for the **staging environment**.
+### Step 2: Obtain SDK Ke
+1. To generate an SDK token select the SDK API Keys tab
+2. Select the staging environment(stg-) and copy server-side key
 
+<img width="1287" height="335" alt="image" src="https://github.com/user-attachments/assets/e3f470e3-3ef3-4cf1-893f-6959a32dc881" />
 ---
 
 ### Step 3: Configure Project Variables
@@ -46,19 +62,23 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
 2. Edit the variable `sdk_key`.  
 3. In the **Fixed Value** input box, paste the key you copied earlier.  
 
-> 💡 **Note:** For production deployments, store keys as secrets. For this lab, plain text is acceptable.
+
+> [!NOTE]
+> For production deployments, store keys as secrets. For this lab, plain text is acceptable.
 
 ---
 
 ### Step 4: Deploy and Validate
-1. Deploy your application.
-2. From the Harness module selector select Continuous Delivery
-3. From the **left-hand side menu**, select **Pipelines**
+1. From the Harness module selector select Continuous Delivery
+2. From the **left-hand side menu**, select **Pipelines**
 4. Run the **springboot-deploy** pipeline
-5. Once deployed, navigate to the application, url of the app: http://<<project_name>>.cie-demo.co.uk 
-6. Select one of the predefined **users**, and view the list of available features.  
+5. From the **left-hand side menu**, select **Project Settings → Variables**.
+6. The URL of the deployed application can be seen under **fme_url**
+7. The application will be used to validate Feature Flag changes as we progress through the lab
 
-🧠 **Question:** What do you notice about the available features?
+<img width="1567" height="346" alt="image" src="https://github.com/user-attachments/assets/a608515f-362c-4747-bf48-8a7ad1b4a39a" />
+
+
 
 ---
 
