@@ -329,6 +329,8 @@ This application tracks these events automatically:
 5. **Repeat** to create additional metrics:
 
 
+## User Login Rate
+
    | Field | Value |
    |-------|-------|
    | **Name** | <pre>`User Login Rate`</pre> |
@@ -337,6 +339,9 @@ This application tracks these events automatically:
    | **Measure as** | **Count** (counts total events) |
    | **Event Type** | `user.login` |
 
+
+
+## Dashboard Engagement
 
    | Field | Value |
    |-------|-------|
@@ -370,14 +375,23 @@ If a guardrail threshold is breached, you'll be alerted to investigate or halt t
 
    | Field | Value |
    |-------|-------|
-   | **Name** | `Login Success Guardrail` |
-   | **Event Type** | `user.login` |
-   | **Aggregation** | **Sum** (sum of event values) |
+   | **Name** | <pre>`Login Success Guardrail`</pre> |
+   | **Metric category** | Guardrail metrics |
    | **Traffic Type** | `user` |
-   | **Guardrail** | ✅ **Enable** |
-   | **Threshold** | `-20%` (alert if metric drops more than 20%) |
+   | **Measure as** | **Sum** (sum of event values) |
+   | **Event Type** | `user.login` |
 
-3. Click **Save**.
+3. Click **Create**
+4. From the Navigation bar select **Alert Policy**
+5. Click **Create alert policy**
+
+   | Field | Value |
+   |-------|-------|
+   | **Name** | <pre>`reduced footprint`</pre>|
+   | **Choose your environment** | stg-.... |
+   | **Alert degradation** | `-20%` (alert if metric drops more than 20%) |
+
+7. Click **Create alert policy**.
 
 💡 **Note**: The `user.login` event is configured to show **negative impact** when the feature is "on" (on=45.0 vs off=95.0) — this demonstrates guardrail detection in action!
 
@@ -396,25 +410,23 @@ Now let's attach metrics to a feature flag and run an experiment!
 
 #### Attach Metrics to a Flag
 
-1. Go to **Feature Flags** → Select `target_country` (or another flag with 50/50 rollout).
-2. Navigate to the **Metrics** tab.
+1. Go to **Feature Flags** → Select `target_country` 
+2. Navigate to the **Metrics Impact** tab.
 3. Click **Add Metrics**.
 4. Select:
    - ✅ `Feature Evaluation Success` (primary metric)
-   - ✅ `Login Success Guardrail` (guardrail)
+   - ✅ `User Login Rate` (guardrail)
    - ✅ `Dashboard Engagement` (secondary metric)
 5. Click **Save**.
+
+> [!WARNING]
+> Note that the guardrail metric is added automatically to reduce mean time to detect any performance issue
+
+
 
 #### Run Traffic Simulation
 
 If not already running, trigger simulation:
-
-1. **Via UI**: Navigate to `/simulate` and click "Simulate users & generate traffic"
-2. **Via API**: 
-   ```bash
-   curl -X POST "http://<<project_name>>.cie-demo.co.uk/api/simulate?minPerTreatment=350"
-   ```
-3. Wait for **≥350 samples per treatment** (on and off).
 
 #### View Experiment Results
 
