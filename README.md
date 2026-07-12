@@ -235,14 +235,15 @@ This simulates a **progressive rollout** of the feature.
 
 | Field | Value |
 |--------|--------|
-| **Name** | `pro_users_dynamic` |
+| **Name** | <pre>`pro_users_dynamic`</pre> |
 | **Segment Type** | Rule-based |
 | **Traffic Type** | user |
 
-3. Under **Targeting Rules**, click **+ Add New Rule**:  
+3. Click **Add definition**
+4. Under **Targeting Rules**, click **+ Add New Rule**:  
    - **If** `plan` is in list `pro`.
 
-4. Review and **Save**.
+5. Review and **Save**.
 
 ---
 
@@ -252,7 +253,7 @@ This simulates a **progressive rollout** of the feature.
 
 | Field | Value |
 |--------|--------|
-| **Name** | `target_pro_users_segment` |
+| **Name** | <pre>`target_pro_users_segment`</pre> |
 
 3. Initiate flag for **staging** environment.  
 4. Add a new target:
@@ -276,7 +277,6 @@ Now that you've created feature flags and targeting rules, let's set up **experi
 
 Before setting up metrics, you need event data. This application includes a **traffic simulation** feature that generates synthetic impressions and events.
 
-#### Option A: Manual Simulation (UI)
 
 1. In the application, navigate to the **Simulate** page from the top navigation.
 2. Click **"Simulate users & generate traffic"** button.
@@ -286,38 +286,8 @@ Before setting up metrics, you need event data. This application includes a **tr
    - Impressions registered (via `getTreatment`)
    - Events tracked (via `track()`)
 
-#### Option B: Automatic Background Simulation
-
-For continuous event generation, enable **scheduled background simulation**:
-
-1. Edit your deployment configuration or `values.yaml`:
-   ```yaml
-   env:
-     SIMULATION_SCHEDULED_ENABLED: "true"
-     SIMULATION_SCHEDULED_FIXED_DELAY_MS: "5000"
-     SIMULATION_SCHEDULED_MIN_PER_TREATMENT: "100"
-   ```
-
-2. Redeploy the application - simulation will run automatically every 5 seconds.
-
-3. Monitor via API:
-   ```bash
-   curl "http://<<project_name>>.cie-demo.co.uk/api/simulate/status"
-   ```
 
 📖 **Learn more**: See [docs/SCHEDULED_SIMULATION.md](docs/SCHEDULED_SIMULATION.md) for configuration details.
-
-#### Option C: API-Based Simulation
-
-Trigger simulation via REST API:
-
-```bash
-# Start simulation (non-blocking)
-curl -X POST "http://<<project_name>>.cie-demo.co.uk/api/simulate?minPerTreatment=100"
-
-# Check status
-curl "http://<<project_name>>.cie-demo.co.uk/api/simulate/status"
-```
 
 ---
 
@@ -341,23 +311,41 @@ This application tracks these events automatically:
 1. From Harness FME, navigate to **Metrics** → **Create Metric**.
 2. Fill in the following:
 
+> [!WARNING]
+> Leave all other settings with their default value
+
    | Field | Value |
    |-------|-------|
-   | **Name** | `Feature Evaluation Success` |
-   | **Event Type** | `feature.evaluated` |
-   | **Aggregation** | **Count** (counts total events) |
+   | **Name** | <pre>`Feature Evaluation Success`</pre> |
+   | **Owners** | All Project Users |
    | **Traffic Type** | `user` |
+   | **Measure as** | **Count** (counts total events) |
+   | **Event Type** | `feature.evaluated` |
 
-3. Click **Save**.
 
-4. **Repeat** to create additional metrics:
-   - **Name**: `User Login Rate`  
-     **Event**: `user.login`  
-     **Aggregation**: Count
+
+4. Click **Create**.
+
+5. **Repeat** to create additional metrics:
+
+
+   | Field | Value |
+   |-------|-------|
+   | **Name** | <pre>`User Login Rate`</pre> |
+   | **Owners** | All Project Users |
+   | **Traffic Type** | `user` |
+   | **Measure as** | **Count** (counts total events) |
+   | **Event Type** | `user.login` |
+
+
+   | Field | Value |
+   |-------|-------|
+   | **Name** | <pre>`Dashboard Engagement`</pre> |
+   | **Owners** | All Project Users |
+   | **Traffic Type** | `user` |
+   | **Measure as** | **Count** (counts total events) |
+   | **Event Type** | `feature.dashboard_viewed` |
    
-   - **Name**: `Dashboard Engagement`  
-     **Event**: `feature.dashboard_viewed`  
-     **Aggregation**: Count
 
 💡 **Tip**: Event values are pre-calibrated in this workshop to produce different experiment outcomes (positive, negative, inconclusive) for learning purposes.
 
