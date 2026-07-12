@@ -185,11 +185,13 @@ This simulates a **progressive rollout** of the feature.
 | **Segment Type** | Standard |
 | **Traffic Type** | user |
 
-3. Ensure environment = **staging-user1**.  
-4. Under **User Section**, click **Add Individually** and add users:  
+3. Click **Create**
+4. Ensure environment = **staging-user1**.
+5. Click **Add definition**
+6. Then **Add User**, click **Add Individually** and add users:  
    - `u001`  
    - `u006`  
-5. Click **Save**.
+7. Click **Save**.
 
 <img width="600" height="500" alt="image" src="https://github.com/user-attachments/assets/496d2fd3-79cc-4f24-a7a9-630ba323098a" />
 
