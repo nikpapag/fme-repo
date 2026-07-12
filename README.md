@@ -79,6 +79,15 @@ As part of this lab, we will switch between modules several times.
 
 <img width="1567" height="346" alt="image" src="https://github.com/user-attachments/assets/a608515f-362c-4747-bf48-8a7ad1b4a39a" />
 
+9. The application allows to simulate users with different characteristics
+
+#### Tip
+> [!TIP]
+> Pick a user and navigate through the available options
+> Under the navigation bar you can see the attributed Feature Flags and an option to evaluate flags on demand
+
+> [!NOTE]
+> For the remaining of the lab we will not need to re-deploy the application while performing multiple releases
 
 
 ---
