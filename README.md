@@ -72,9 +72,10 @@ As part of this lab, we will switch between modules several times.
 1. From the Harness module selector select Continuous Delivery
 2. From the **left-hand side menu**, select **Pipelines**
 4. Run the **springboot-deploy** pipeline
-5. From the **left-hand side menu**, select **Project Settings → Variables**.
-6. The URL of the deployed application can be seen under **fme_url**
-7. The application will be used to validate Feature Flag changes as we progress through the lab
+5. After the pipeline completes successfully validate the app is running
+6. From the **left-hand side menu**, select **Project Settings → Variables**.
+7. The URL of the deployed application can be seen under **fme_url**
+8. The application will be used to validate Feature Flag changes as we progress through the lab
 
 <img width="1567" height="346" alt="image" src="https://github.com/user-attachments/assets/a608515f-362c-4747-bf48-8a7ad1b4a39a" />
 
