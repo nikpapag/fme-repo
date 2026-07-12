@@ -81,7 +81,6 @@ As part of this lab, we will switch between modules several times.
 
 9. The application allows to simulate users with different characteristics
 
-#### Tip
 > [!TIP]
 > Pick a user and navigate through the available options
 > Under the navigation bar you can see the attributed Feature Flags and an option to evaluate flags on demand
