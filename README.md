@@ -498,35 +498,6 @@ You’ve now explored:
 🎉 **Great job!**
 
 
----
-
-## Repository structure
-
-| Path | Purpose |
-|------|---------|
-| `application/` | Spring Boot workshop app with Harness FME Java SDK |
-| `manifests/` | Kubernetes deployment templates |
-| `values.yaml` | Harness CD service values (SDK key, event tracking env) |
-
----
-
-## Event tracking and experimentation
-
-This repo sends **Harness FME events** via the Java SDK [`track()`](https://developer.harness.io/docs/feature-management-experimentation/release-monitoring/events/setup) method so you can build **metrics** and measure **experiment impact**.
-
-### Built-in events
-
-| Event type | When fired | Expected Experiment Impact |
-|------------|------------|---------------------------|
-| `feature.evaluated` | Each `getTreatment` evaluation (includes split, treatment, plan, country) | ✅ **POSITIVE** - on=1.0 vs off=0.1 |
-| `user.login` | User signs in | ❌ **NEGATIVE** - on=45.0 vs off=95.0 (regression) |
-| `user.impersonated` | User impersonation | ✅ **POSITIVE** - on=65.0 vs off=15.0 |
-| `feature.dashboard_viewed` | Dashboard load | ⚪ **INCONCLUSIVE** - on=8.2 vs off=8.0 (no sig. diff) |
-
-Events use traffic type **`user`** — the same key as flag evaluations — so metrics attribute correctly to treatments.
-
-**Note**: Event values are calibrated to produce **varied experiment outcomes** (positive, negative, and inconclusive) for workshop demonstration purposes.
-
 
 
 
