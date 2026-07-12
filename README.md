@@ -95,7 +95,7 @@ As part of this lab, we will switch between modules several times.
 
 ### Step 1: Create Feature Flag
 1. From the module selection menu, select **Feature Management & Experimentation**.  
-2. On the right-hand side menu, go to **Feature Flags → Create Feature Flag**.  
+2. On the left-hand side menu, go to **Feature Flags → Create Feature Flag**.  
 3. Fill in the following:
 
 | Field | Value |
@@ -103,8 +103,10 @@ As part of this lab, we will switch between modules several times.
 | **Name** | <pre>`target_country`</pre> |
 | **Owners** | <pre>`All Project Users`</pre> |
 
-4. Select the **staging** environment and click **Initiate Environment**.  
-5. Review changes and click **Save**.
+
+4. Click **Create**
+4. From the new menu select the **Stg** envronment and **Initiate Environment**
+5. Click **Review changes** (default for now) and click **Save**.
 
 ---
 
