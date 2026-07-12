@@ -19,8 +19,7 @@ By the end of the lab, you'll understand environment setup, targeting, rollouts,
    - [Create Metrics](#step-2-create-metrics)
    - [Set Up Guardrail Metrics](#step-3-set-up-guardrail-metrics)
    - [Test Your Experiment](#step-4-test-your-experiment)
-8. [Validate Experience During Outage (Advanced)](#-8-validate-experience-during-outage-advanced)
-9. [Review and Wrap-Up](#-9-review-and-wrap-up)
+8. [Review and Wrap-Up](#-9-review-and-wrap-up)
 
 ---
 ## Lab Pre-Read
@@ -37,6 +36,13 @@ As part of this lab, we will switch between modules several times.
 
 
 ## ⚙️ 1. Create Workshop Environment
+
+### Overview
+Configure environment-specific SDK keys and deploy the workshop application for testing feature flags.
+
+### Value
+Server-side SDKs cache flag rules locally for fast evaluation without network calls. Real-time updates via Stream Processor enable instant feature changes without redeployment
+
 
 ### Step 1: Access Project Settings
 1.  In the Harness UI, navigate to the **Feature Management & Experimentation** module
@@ -93,6 +99,13 @@ As part of this lab, we will switch between modules several times.
 
 ## 🚀 2. Create a Feature Flag
 
+### Overview
+Create your first feature flag and validate it in the application. Learn how flags decouple deployment from release.
+
+### Value
+Feature flags increase delivery velocity while reducing risk. Deploy code in smaller chunks and more often by merging feature branches sooner. Release coordination is simplified as business teams can control features independently without engineering involvement
+
+
 ### Step 1: Create Feature Flag
 1. From the module selection menu, select **Feature Management & Experimentation**.  
 2. On the left-hand side menu, go to **Feature Flags → Create Feature Flag**.  
@@ -123,7 +136,11 @@ As part of this lab, we will switch between modules several times.
 
 ## 🎯 3. Attribute-Based Targeting
 
-Let’s target specific user attributes.
+### Overview
+Target users based on custom attributes like country, subscription tier, or device type for context-aware feature delivery.
+
+### Value
+Enables flexible segmentation beyond user IDs for business-relevant rollouts. Uses deterministic hashing to ensure users get the same flag value consistently across all services 
 
 ### Step 1: Add Targeting Rules
 1. Go back to your feature flag `target_country`.  
@@ -155,6 +172,12 @@ Let’s target specific user attributes.
 
 ## 📈 4. Progressive Rollout
 
+### Overview
+Gradually roll out features using percentage-based distribution (10% → 50% → 100%) to control exposure and monitor impact at each stage.
+
+### Value
+Mitigates risk by testing features incrementally before full release. Deterministic assignment ensures user continuity, original users maintain access as percentages increase. Enables QA validation without affecting production users
+
 ### Step 1: Switch flag to a progressive rollout
 1. Go to the feature flag configuration for `target_country`.  
 2. Under **Targeting Rules**, change **Serve** to:  
@@ -174,6 +197,12 @@ This simulates a **progressive rollout** of the feature.
 ---
 
 ## 👥 5. Segments
+
+### Overview
+Create static segments to manage groups of users in bulk, such as beta testers or internal teams, with both inclusion and exclusion capabilities.
+
+### Value
+Scalable bulk user management eliminates individual targeting overhead. Supports precision control where individual targets override group rules. Targets can represent users, applications, systems, or any uniquely identified resource 
 
 ### Step 1: Create Segment
 1. From the **left-hand side menu**, select **Segments → Create Segment**.  
@@ -229,6 +258,12 @@ This simulates a **progressive rollout** of the feature.
 
 ## 🔄 6. Dynamic Segments
 
+### Overview
+Create rule-based segments that automatically include targets matching specified conditions, eliminating manual user management.
+
+### Value
+Automates segmentation at scale. New users matching criteria are automatically included without manual intervention. Supports complex logic with AND rules for sophisticated targeting. Scales effortlessly as your user base grows
+
 ### Step 1: Create Dynamic Segment
 1. From the **left-hand side menu**, go to **Segments → Create Segment**.  
 2. Configure:
@@ -271,7 +306,12 @@ This simulates a **progressive rollout** of the feature.
 
 ## 🔬 7. Experimentation with Metrics and Guardrails
 
-Now that you've created feature flags and targeting rules, let's set up **experimentation** to measure the impact of your feature on key business metrics.
+
+### Overview
+Set up A/B testing with standardised metrics and guardrail protection to measure feature impact on business outcomes and detect regressions automatically.
+
+### Value
+Self-service experimentation without specialist headcount. Every team can innovate at the pace of ideas. Auto capture performance metrics the moment gradual releases begin, detecting the impact of each individual feature even with concurrent releases. Guardrail metrics protect against negative impacts with instant alerts. AI-powered insights explain results and provide guided next steps 
 
 ### Step 1: Generate Experiment Traffic
 
@@ -482,7 +522,7 @@ If not already running, trigger simulation:
 
 ---
 
-## 🎓 9. Review and Wrap-Up
+## 🎓 8. Review and Wrap-Up
 
 ### ✅ You’ve completed the Feature Management & Experimentation Workshop!
 
