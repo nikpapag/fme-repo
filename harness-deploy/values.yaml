@@ -17,7 +17,7 @@ serviceType: LoadBalancer
 servicePort: 8080
 serviceTargetPort: 8080
 
-project_domain: <+variable.fmesubdomain>
+project_domain: <+variable.fme_subdomain>
 lab_subdomain: <+variable.lab_subdomain>
 
 env:
