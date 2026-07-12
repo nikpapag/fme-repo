@@ -50,7 +50,7 @@ As part of this lab, we will switch between modules several times.
 
 ---
 
-### Step 2: Obtain SDK Ke
+### Step 2: Obtain SDK Key
 1. To generate an SDK token select the SDK API Keys tab
 2. Select the staging environment(stg-) and copy server-side key
 
