@@ -51,9 +51,6 @@ Server-side SDKs cache flag rules locally for fast evaluation without network ca
 4.  Among all visible projects, click **View** (under Actions) for the one relevant to your user.
 5.  You should see two environments we’ll use the **staging** environment for this lab
 
-
-
-
 ---
 
 ### Step 2: Obtain SDK Key
@@ -61,6 +58,7 @@ Server-side SDKs cache flag rules locally for fast evaluation without network ca
 2. Select the staging environment(stg-) and copy server-side key
 
 <img width="1287" height="335" alt="image" src="https://github.com/user-attachments/assets/e3f470e3-3ef3-4cf1-893f-6959a32dc881" />
+
 ---
 
 ### Step 3: Configure Project Variables
@@ -68,10 +66,8 @@ Server-side SDKs cache flag rules locally for fast evaluation without network ca
 2. Edit the variable `sdk_key`.  
 3. In the **Fixed Value** input box, paste the key you copied earlier.  
 
-
 > [!NOTE]
 > For production deployments, store keys as secrets. For this lab, plain text is acceptable.
-
 ---
 
 ### Step 4: Deploy and Validate
@@ -116,10 +112,10 @@ Feature flags increase delivery velocity while reducing risk. Deploy code in sma
 | **Name** | <pre>`target_country`</pre> |
 | **Owners** | <pre>`All Project Users`</pre> |
 
-
 4. Click **Create**
 4. From the new menu select the **Stg** envronment and **Initiate Environment**
 5. Click **Review changes** (default for now) and click **Save**.
+
 
 ---
 
@@ -133,7 +129,6 @@ Feature flags increase delivery velocity while reducing risk. Deploy code in sma
 <img width="1204" height="723" alt="image" src="https://github.com/user-attachments/assets/1154f743-eb75-41a2-84e4-52426d042027" />
 
 ---
-
 ## 🎯 3. Attribute-Based Targeting
 
 ### Overview
@@ -152,11 +147,6 @@ Enables flexible segmentation beyond user IDs for business-relevant rollouts. Us
 | If <pre>`country`</pre> is in list <pre>`UK`</pre> | Serve **On** |
 
 <img width="1249" height="263" alt="image" src="https://github.com/user-attachments/assets/d0eb73f2-3edf-4e7f-8ab4-1a769125c953" />
-
-
-4. Click **Review changes**
-5. Validate the audit of the change (change diff)
-6. Click **Save**.
 
 ---
 
@@ -180,7 +170,7 @@ Mitigates risk by testing features incrementally before full release. Determinis
 
 ### Step 1: Switch flag to a progressive rollout
 1. Go to the feature flag configuration for `target_country`.  
-2. Under **Targeting Rules**, change **Serve** to:  
+2. Under the **ELSE** block for the **Targeting Rules**, change **Serve** to:  
    > “Distribute treatments as follows”
 
 | Treatment | Percentage |
@@ -191,7 +181,7 @@ Mitigates risk by testing features incrementally before full release. Determinis
 This simulates a **progressive rollout** of the feature.
 
 ### Step 2: Validate
-1. In the browser app, navigate to the users tab and select users from the **UK**.  
+1. In the browser app, navigate to the users tab and select users from any location.  
 2. Navigate to **Evaluate Flag** → check if the flag is **on** or **off**.
 
 ---
@@ -205,7 +195,7 @@ Create static segments to manage groups of users in bulk, such as beta testers o
 Scalable bulk user management eliminates individual targeting overhead. Supports precision control where individual targets override group rules. Targets can represent users, applications, systems, or any uniquely identified resource 
 
 ### Step 1: Create Segment
-1. From the **left-hand side menu**, select **Segments → Create Segment**.  
+1. From the **left-hand side menu**, select **Segments → Create Segment**.
 2. Configure:
 
 | Field | Value |
@@ -213,14 +203,14 @@ Scalable bulk user management eliminates individual targeting overhead. Supports
 | **Name** | `beta_users` |
 | **Segment Type** | Standard |
 | **Traffic Type** | user |
+| **Owners** | All Project Users |
 
-3. Click **Create**
-4. Ensure environment = **staging-user1**.
-5. Click **Add definition**
-6. Then **Add User**, click **Add Individually** and add users:  
+3. Ensure environment = Your relevant **Staging** environment.  
+4. Click **Add definition**
+5. Under **User Section**, click **Add Individually** and add users:  
    - `u001`  
    - `u006`  
-7. Click **Save**.
+6. Click **Save**.
 
 <img width="600" height="500" alt="image" src="https://github.com/user-attachments/assets/496d2fd3-79cc-4f24-a7a9-630ba323098a" />
 
@@ -235,14 +225,16 @@ Scalable bulk user management eliminates individual targeting overhead. Supports
 | Field | Value |
 |--------|--------|
 | **Name** | <pre>`target_beta_users`</pre> |
+| **Traffic Type** | `user` |
+| **Owners** | `All Project Users` |
 
 
-3. Initiate the flag for the **staging** environment.  
+3. Initiate the flag for the relevant **staging** environment.  
 4. Select **Add New Individual Target**:
 
 | Description | To Segments |
 |--------------|--------------|
-| on | beta_users |
+| on | `beta_users` |
 
 
 5. Review and **Save**.
@@ -273,12 +265,17 @@ Automates segmentation at scale. New users matching criteria are automatically i
 | **Name** | <pre>`pro_users_dynamic`</pre> |
 | **Segment Type** | Rule-based |
 | **Traffic Type** | user |
+| **Owners** | `All Project Users` |
 
 3. Click **Add definition**
 4. Under **Targeting Rules**, click **+ Add New Rule**:  
    - **If** `plan` is in list `pro`.
 
 5. Review and **Save**.
+
+> [!NOTE]
+> You have to type `plan` and press enter in the left empty box and then `pro` and press enter on the right hand side
+
 
 ---
 
@@ -288,14 +285,16 @@ Automates segmentation at scale. New users matching criteria are automatically i
 
 | Field | Value |
 |--------|--------|
-| **Name** | <pre>`target_pro_users_segment`</pre> |
+| **Name** | `target_pro_users_segment` |
+| **Traffic Type** | `user` |
+| **Owners** | `All Project Users` |
 
 3. Initiate flag for **staging** environment.  
 4. Add a new target:
 
 | Description | To Segments |
 |--------------|--------------|
-| on | pro_users_dynamic |
+| on | `pro_users_dynamic` |
 
 5. Review and **Save**.
 
@@ -317,6 +316,7 @@ Self-service experimentation without specialist headcount. Every team can innova
 
 Before setting up metrics, you need event data. This application includes a **traffic simulation** feature that generates synthetic impressions and events.
 
+#### Manual Simulation (UI)
 
 1. In the application, navigate to the **Simulate** page from the top navigation.
 2. Click **"Simulate users & generate traffic"** button.
@@ -326,8 +326,16 @@ Before setting up metrics, you need event data. This application includes a **tr
    - Impressions registered (via `getTreatment`)
    - Events tracked (via `track()`)
 
+5. **Verify Data Flow**: Open **Data Hub Live Tail** (two browser tabs) for both impressions and events to confirm they are flowing in for your environment:
+   - Navigate to **Data Hub** in Harness FME
+   - Select **Live Tail** 
+   - Filter by your relevant **Staging** environment to see real-time impressions (first tab) and events (second tab)
+   - Notice your impressions and events flowing into the Platform
 
-📖 **Learn more**: See [docs/SCHEDULED_SIMULATION.md](docs/SCHEDULED_SIMULATION.md) for configuration details.
+
+> [!NOTE]
+> In case you are not receiving any traffic for impressions and events, ensure you have selected the correct and relevant **Staging** environment
+
 
 ---
 
@@ -339,12 +347,12 @@ Metrics let you measure the impact of feature flag treatments on business outcom
 
 This application tracks these events automatically:
 
-| Event Type | Description | Expected Impact |
-|------------|-------------|-----------------|
-| `feature.evaluated` | Flag evaluation event | ✅ Positive (on > off) |
-| `user.login` | User login event | ❌ Negative (on < off) - demonstrates regression detection |
-| `user.impersonated` | User impersonation action | ✅ Positive (on > off) |
-| `feature.dashboard_viewed` | Dashboard view event | ⚪ Inconclusive (on ≈ off) |
+| Event Type | Description | Desired Impact Direction |
+|------------|-------------|--------------------------|
+| `feature.evaluated` | Flag evaluation event | ✅ **Increase** (on > off) |
+| `user.login` | User login event | ❌ **Decrease** (on < off) - demonstrates regression detection |
+| `user.impersonated` | User impersonation action | ✅ **Increase** (on > off) |
+| `feature.dashboard_viewed` | Dashboard view event | ⚪ **Inconclusive** (on ≈ off) |
 
 #### Create a Metric
 
@@ -356,18 +364,19 @@ This application tracks these events automatically:
 
    | Field | Value |
    |-------|-------|
-   | **Name** | <pre>`Feature Evaluation Success`</pre> |
+   | **Name** | <pre>`Feature Evaluation Success`</pre>|
    | **Owners** | All Project Users |
+   | **Metric Category** | **None** |
+   | **Select Desired Impact** | **Increase** (positive) |
    | **Traffic Type** | `user` |
-   | **Measure as** | **Count** (counts total events) |
+   | **Aggregation** | **Count of events per user** (counts total events) |
    | **Event Type** | `feature.evaluated` |
 
+   
 
+3. Click **Create**.
 
-4. Click **Create**.
-
-5. **Repeat** to create additional metrics:
-
+4. **Repeat** to create additional metrics:
 
 ## User Login Rate
 
@@ -375,8 +384,10 @@ This application tracks these events automatically:
    |-------|-------|
    | **Name** | <pre>`User Login Rate`</pre> |
    | **Owners** | All Project Users |
+   | **Metric Category** | **None** |
+   | **Select Desired Impact** | **Increase** (positive) |
    | **Traffic Type** | `user` |
-   | **Measure as** | **Count** (counts total events) |
+   | **Measure as** | **Count of events per user** (counts total events) |
    | **Event Type** | `user.login` |
 
 
@@ -387,12 +398,15 @@ This application tracks these events automatically:
    |-------|-------|
    | **Name** | <pre>`Dashboard Engagement`</pre> |
    | **Owners** | All Project Users |
+   | **Metric Category** | **None** |
+   | **Select Desired Impact** | **Increase** (positive) |
    | **Traffic Type** | `user` |
-   | **Measure as** | **Count** (counts total events) |
+   | **Measure as** | **Count of events per user** (counts total events) |
    | **Event Type** | `feature.dashboard_viewed` |
-   
 
-💡 **Tip**: Event values are pre-calibrated in this workshop to produce different experiment outcomes (positive, negative, inconclusive) for learning purposes.
+> [!TIP]
+> Event values are pre-calibrated in this workshop to produce different experiment outcomes (positive, negative, inconclusive) for learning purposes
+
 
 ---
 
@@ -415,25 +429,29 @@ If a guardrail threshold is breached, you'll be alerted to investigate or halt t
 
    | Field | Value |
    |-------|-------|
-   | **Name** | <pre>`Login Success Guardrail`</pre> |
-   | **Metric category** | Guardrail metrics |
+   | **Name** | `Login Success Guardrail` |
+   | **Owners** | All Project Users |
+   | **Metric Category** | **Guardrail metric** ⚠️ *Must be set to "Guardrail metric" to appear under Guardrail metrics* |
+   | **Select Desired Impact** | **Increase** (positive) |
    | **Traffic Type** | `user` |
-   | **Measure as** | **Sum** (sum of event values) |
+   | **Aggregation** | **Sum** (sum of event values) |
    | **Event Type** | `user.login` |
 
 3. Click **Create**
 4. From the Navigation bar select **Alert Policy**
 5. Click **Create alert policy**
 
-   | Field | Value |
+| Field | Value |
    |-------|-------|
-   | **Name** | <pre>`reduced footprint`</pre>|
-   | **Choose your environment** | stg-.... |
-   | **Alert degradation** | `-20%` (alert if metric drops more than 20%) |
+   | **Name** | `Reduced Footprint` |
+   | **Choose your environment** | Relevant `stg-...` |
+   | **Relevant Difference** | `20%` (alert if metric drops more than 20%) ⚠️ *Note: Use positive value only - negative values not supported* |
+   | **Define alert notification channel** | `Leave as default` |
 
-7. Click **Create alert policy**.
+6. Click **Save**.
 
-💡 **Note**: The `user.login` event is configured to show **negative impact** when the feature is "on" (on=45.0 vs off=95.0) — this demonstrates guardrail detection in action!
+> NOTE
+> The `user.login` event is configured to show **negative impact** when the feature is "on" (on=45.0 vs off=95.0) — this demonstrates guardrail detection in action!
 
 #### Best Practices for Guardrails
 
@@ -450,28 +468,51 @@ Now let's attach metrics to a feature flag and run an experiment!
 
 #### Attach Metrics to a Flag
 
-1. Go to **Feature Flags** → Select `target_country` 
-2. Navigate to the **Metrics Impact** tab.
+1. Go to **Feature Flags** → Select `target_country` (or another flag with 50/50 rollout).
+2. Navigate to the **Metrics** tab.
 3. Click **Add Metrics**.
 4. Select:
    - ✅ `Feature Evaluation Success` (primary metric)
-   - ✅ `User Login Rate` (guardrail)
+   - ✅ `Login Success Guardrail` (guardrail)
    - ✅ `Dashboard Engagement` (secondary metric)
 5. Click **Save**.
+6. Click **"Recalculate All Metrics"** to ensure all metric calculations are up to date.
 
 > [!WARNING]
 > Note that the guardrail metric is added automatically to reduce mean time to detect any performance issue
 
 
-
 #### Run Traffic Simulation
-
 If not already running, trigger simulation:
+
+
+💡 **While waiting (5-10 minutes)**: Review your experiment settings to ensure everything is configured correctly. Verify:
+   - Flag targeting rules are set properly
+   - Metrics are attached correctly
+   - Environment settings match your expectations
+   - Navigate to **FME Settings** on the left, under the **Experimentation settings** section, click on **Monitor window and statistics**
+   - Ensure the following is configured:
+
+| Field | Value |
+|-------|-------|
+| **Monitor window** | `24 hours` |
+| **Monitor significance threshold** | `0.05` |
+| **Testing Method** | `Fixed Horizon` |
+| **Default significance threshold** | `0.2` |
+| **Minimum Sample size** | `10` |
+| **Default power threshold** | `80` |
+| **Experimental Review Period** | `1 Day` |
+| **Multiple comparison correction** | ✅ |
+   
+   The default experiment settings are fine, but confirming helps ensure you know where to find these settings.
+   
+   **Note**: These Experiment Settings are only setup like this for this Hands-on lab. In production systems, please refer to your relevant teams to ensure appropriate settings are applied based on your business and industry.
 
 #### View Experiment Results
 
-1. Go to **Feature Flags** → `target_country` → **Metrics** tab.
-2. After **5-10 minutes** (event processing pipeline delay), you'll see:
+1. Go to **Feature Flags** → `target_country` → **Metrics Impact** tab.
+2. Ensure a **minimum of 10 event entries have been registered for each treatment** (on and off) for calculations to appear.
+3. After **5-10 minutes** (event processing pipeline delay), you'll see:
 
    **Expected Results:**
    
@@ -484,7 +525,10 @@ If not already running, trigger simulation:
    | `Dashboard Engagement` | **On** | ⚪ **+2.5% lift** (inconclusive) |
    | `Dashboard Engagement` | **Off** | Baseline |
 
-3. **Guardrail Alert**: Notice the login metric triggered a guardrail warning! This indicates the feature may be causing login issues and warrants investigation.
+4. **Guardrail Alert**: Notice the login metric triggered a guardrail warning! This indicates the feature may be causing login issues and warrants investigation.
+
+> NOTE
+> Initial results may show as "Inconclusive" during the first 10-15 minutes as events are still processing. With more data collection, the expected results above should appear. Results timing varies based on event throughput and processing pipeline latency.
 
 #### Interpret Results
 
@@ -537,8 +581,5 @@ You’ve now explored:
 
 🎉 **Great job!**
 
-
-
-
-
+---
 
