@@ -104,7 +104,7 @@ Feature flags increase delivery velocity while reducing risk. Deploy code in sma
 
 ### Step 1: Create Feature Flag
 1. From the module selection menu, select **Feature Management & Experimentation**.  
-2. On the right-hand side menu, go to **Feature Flags → Create Feature Flag**.  
+2. On the left-hand side menu, go to **Feature Flags → Create Feature Flag**.  
 3. Fill in the following:
 
 | Field | Value |
@@ -224,7 +224,7 @@ Scalable bulk user management eliminates individual targeting overhead. Supports
 
 | Field | Value |
 |--------|--------|
-| **Name** | `target_beta_users` |
+| **Name** | <pre>`target_beta_users`</pre> |
 | **Traffic Type** | `user` |
 | **Owners** | `All Project Users` |
 
@@ -262,7 +262,7 @@ Automates segmentation at scale. New users matching criteria are automatically i
 
 | Field | Value |
 |--------|--------|
-| **Name** | `pro_users_dynamic` |
+| **Name** | <pre>`pro_users_dynamic`</pre> |
 | **Segment Type** | Rule-based |
 | **Traffic Type** | user |
 | **Owners** | `All Project Users` |
